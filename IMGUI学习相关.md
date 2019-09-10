@@ -1,0 +1,16 @@
+### 关于GUI控件
+- Label：不可交互的文本内容
+- Button：点击即返回true
+- RepeatButton：可长按持续触发的button
+- TextFiled：可交互的单行文本
+- TextArea：可交互的且支持多行的文本
+- Toggle：选项控件
+- Toolbar：一行有多个按钮（根据参数数组中元素的数量决定），一次只有一个生效，可以初始化其中一个按钮为激活
+- SelectionGrid：多行版本的Toolbar，可以通过参数控制有多少列
+- HorizontalSlider：滑块，可设置其初始位置，最小值和最大值
+- VerticalSlider：垂直的滑块
+- HorizontalScrollbar：类似上面的滑块，样式不同
+- VerticalScrollbar：同理
+- ScrollView：可xy轴滑动的区域视窗，该控件有两个函数，用于标识哪些控件在该视窗范围内
+- Window：窗口，作用暂且不理解
+- changed：能捕捉到控件的改变
