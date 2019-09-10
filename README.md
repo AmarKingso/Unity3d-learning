@@ -109,10 +109,60 @@ public class example : MonoBehaviour {
 
 #### 遍历对象树
 ```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
+public class example : MonoBehaviour {
+    void Start() {
+        GameObject[] allnode = GameObject.FindObjectsOfType<GameObject>();
+        foreach (GameObject i in allnode)
+            Debug.Log(i.name);
+    }
+}
 ```
 
 #### 清除所有子对象
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class example : MonoBehaviour {
+    void Start() {
+        GameObject root = GameObject.Find("Sphere");
+        foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+            GameObject.Destroy(child.gameObject);
+    }
+}
+```
+
+---
+### 资源预设（Prefabs）与 对象克隆 (clone) 
+#### 预设（Prefabs）有什么好处？
+- 可以回收再利用对象，不用每次都从基础游戏对象构建游戏
+- 有助于对对象进行修改以及保存
+
+#### 预设与对象克隆 (clone or copy or Instantiate of Unity Object) 关系？
+两者都能快速获取相同的游戏对象，区别在于预设是和场景中对应的游戏对象相链接的，当改变预设时，场景中的游戏对象属性也随之改变，而克隆不会改变
+
+#### 制作 table 预制，写一段代码将 table 预制资源实例化成游戏对象
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class example : MonoBehaviour {
+    public GameObject prefab;
+    void Start() {
+        GameObject instance = (GameObject)Instantiate(prefab, transform.position, transform.rotation);
+    }
+}
+```
+保存脚本后，会看到脚本所在的对象的脚本栏中，多出名为prefab的选项，将预制的对象拖入到该选项，点击运行即可
+
+---
+
 
 
 
