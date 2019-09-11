@@ -1,5 +1,6 @@
 ### 关于GUI控件
 - Label：不可交互的文本内容
+- Box：盒子
 - Button：点击即返回true
 - RepeatButton：可长按持续触发的button
 - TextFiled：可交互的单行文本
