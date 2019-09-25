@@ -30,80 +30,60 @@ public class FirstController : MonoBehaviour, ISceneController, IUserAction {
 		boat = new BoatModel();
 		for (int i = 0; i < 3; i++) {
 			role[i] = new RoleModel(1);
-			role[i].SetPosition(new Vector3(-3.25f - 0.5f * i, 1.25f, 0));
-			role[i].SetName("priest" + i);
-			role[i].SetInCoast(i);
+			role[i].setPosition(new Vector3(-3.25f - 0.5f * i, 1.25f, 0));
+			role[i].setName("priest" + i);
+			role[i].getOnCoast(src);
+			src.getOnCoast(role[i]);
 		}
 		for (int i = 3; i < 6; i++) {
 			role[i] = new RoleModel(2);
-			role[i].SetPosition(new Vector3(-3.25f - 0.5f * i, 1.25f, 0));
-			role[i].SetName("devil" + i);
-			role[i].SetInCoast(i);
+			role[i].setPosition(new Vector3(-3.25f - 0.5f * i, 1.25f, 0));
+			role[i].setName("devil" + i);
+			role[i].getOnCoast(src);
+			src.getOnCoast(role[i]);
 		}
 	}
 
 	public void MoveBoat() {
-		for (int i = 0; i < 6; i++) {
-			if (role[i].getInboat() == 0) {
-				if (boat.getPos() == 0)
-					role[i].Move(new Vector3(2.5f, 0.8f, 0));
-				else
-					role[i].Move(new Vector3(-1.5f, 0.8f, 0));
-			}
-			if (role[i].getInboat() == 1) {
-				if (boat.getPos() == 0)
-					role[i].Move(new Vector3(1.5f, 0.8f, 0));
-				else
-					role[i].Move(new Vector3(-2.5f, 0.8f, 0));
-			}
+		if (boat.getEmptyNum() < 2) {
+			//离开岸边就开始检测
+			int tmp = boat.getPos();
+			boat.setPos(1);
+			if ((userGUI.state = GameOver()) == 1)
+				return;
+			boat.Move(tmp);
+			userGUI.state = GameOver();
 		}
-		if (boat.EmptyNum() == 2 || boat.getPos() == 1)
-			return;
-		boat.Move();
-		
+		else
+			return;	
 	}
 
 	public void MoveRole(RoleModel _role) {
-		if (boat.EmptyNum() == 0 || boat.getPos() == 1)		
-			return;
+		CoastModel tmp;
+		if (boat.getPos() == 0)             //船在开始岸边
+			tmp = src;
+		else if (boat.getPos() == 2)        //船在目的岸边
+			tmp = dst;
+		else
+			tmp = null;
 
-		//船上有空位且停靠在岸边
-		if (_role.getPos() == 1) {				//人在船上
-			if (boat.getPos() == 0) {               //船在开始岸边
-				int index_c = src.getEmptyIndex();
-				int index_b = _role.getInboat();
-
-				_role.Move(src.getEmptyPosition());
-
-				_role.change(0, -1, index_c);
-				boat.setPassenger(index_b, 0);
-				src.setEmpty(index_c, _role.getFlag());
-			}
-			else if (boat.getPos() == 2) {        //船在目的岸边
-				int index_c = dst.getEmptyIndex();
-				int index_b = _role.getInboat();
-
-				_role.Move(dst.getEmptyPosition());
-
-				_role.change(2, -1, index_c);
-				boat.setPassenger(index_b, 0);
-				dst.setEmpty(index_c, _role.getFlag());
-			}
+		if (_role.getPos() == 1 && boat.getPos() != 1) {             //人在船上
+			boat.getOffBoat(_role.getName());
+			_role.Move(tmp.getEmptyPosition());
+			_role.getOnCoast(tmp);
+			tmp.getOnCoast(_role);
 		}
-		else {              //人在岸上
+		else {                                          //人在岸上
 			if (_role.getPos() == boat.getPos()) {      //人和船在同一边
-				int index_b = boat.EmptyIndex();
-				int index_c = _role.getIncoast();
-
+				if (boat.getEmptyNum() == 0)
+					return;
+				tmp.getOffCoast(_role.getName());
 				_role.Move(boat.getEmptyPosition());
-
-				_role.change(1, index_b, -1);
-				boat.setPassenger(index_b, _role.getFlag());
-				src.setEmpty(index_c, 0);
+				_role.getOnboat(boat);
+				boat.getOnBoat(_role);
 			}
-			else
-				return;
 		}
+		userGUI.state = GameOver();
 	}
 
 	public int GameOver() {
@@ -112,15 +92,15 @@ public class FirstController : MonoBehaviour, ISceneController, IUserAction {
 		int[] boatnum = boat.getRolesNum();
 
 		if (boat.getPos() == 1) {		
-			if (srcnum[0] < srcnum[1] || dstnum[0] < dstnum[1])
+			if ((srcnum[0] != 0 && srcnum[0] < srcnum[1]) || (dstnum[0] != 0 && dstnum[0] < dstnum[1]))
 				return 1;
 		}
 		else if(boat.getPos() == 0) {
-			if (srcnum[0] + boatnum[0] < srcnum[1] + boatnum[1])
+			if (srcnum[0] != 0 && srcnum[0] + boatnum[0] < srcnum[1] + boatnum[1])
 				return 1;
 		}
 		else {
-			if (dstnum[0] + boatnum[0] < dstnum[1] + boatnum[1])
+			if (dstnum[0] != 0 && dstnum[0] + boatnum[0] < dstnum[1] + boatnum[1])
 				return 1;
 		}
 		if (dst.getEmptyIndex() == -1)
@@ -134,6 +114,6 @@ public class FirstController : MonoBehaviour, ISceneController, IUserAction {
 		dst.reset();
 		boat.reset();
 		for (int i = 0; i < 6; i++)
-			role[i].reset(i);
+			role[i].reset(i, src);
 	}
 }
