@@ -7,7 +7,7 @@ public class CCFlyAction : SSAction{
 	float initSpeed;	//初速度
 	float gravity;		//重力系数
 	float angle;        //初速度的角度
-	public float xSpeed, ySpeed;
+	float xSpeed, ySpeed;
 
 	private CCFlyAction() { }
 
